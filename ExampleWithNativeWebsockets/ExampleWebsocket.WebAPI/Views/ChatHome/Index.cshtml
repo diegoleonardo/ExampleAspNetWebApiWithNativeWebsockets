@@ -1,0 +1,44 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+<div class="row" id="chatform">
+    <div class="row">
+        <input id="inputbox" />
+    </div>
+    <br />
+    <div class="row">
+        <input type="button" class="btn-default" id="btnSendMessage" value="Send" />
+    </div>
+</div>
+<div id="messages" />
+<script>
+    $(document).ready(function () {
+        var username = prompt("Digite seu nome: ");
+
+        var uri = window.location.hostname + ":18732" + window.location.pathname.replace('/ChatHome', '/api/Chat' + '?username=' + username);
+
+        ws = new WebSocket("ws://" + uri);
+
+        ws.onopen = function () {
+            $("#messages").prepend('<div>Connected.</div>');
+
+            $("#btnSendMessage").on("click", function (event) {
+                ws.send($("#inputbox").val());
+                $("#inputbox").val("");
+                event.preventDefault();
+            });
+        };
+
+        ws.onerror = function (event) {
+            $("#messages").prepend("<div>ERROR</div>");
+        };
+
+        ws.onmessage = function (event) {
+            $("#messages").prepend("<div>" + event.data + "</div>");
+        };
+
+    });
+</script>
